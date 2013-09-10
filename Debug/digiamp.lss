@@ -1,0 +1,124 @@
+
+digiamp.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .data         00000000  00800100  0000006a  000000de  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  1 .text         0000006a  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  2 .stab         000006cc  00000000  00000000  000000e0  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  3 .stabstr      00000097  00000000  00000000  000007ac  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  4 .comment      0000002f  00000000  00000000  00000843  2**0
+                  CONTENTS, READONLY
+  5 .debug_aranges 00000030  00000000  00000000  00000872  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_info   0000014a  00000000  00000000  000008a2  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_abbrev 0000009a  00000000  00000000  000009ec  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_line   0000010a  00000000  00000000  00000a86  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_frame  00000044  00000000  00000000  00000b90  2**2
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_str    000000ad  00000000  00000000  00000bd4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000020  00000000  00000000  00000c81  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	19 c0       	rjmp	.+50     	; 0x34 <__ctors_end>
+   2:	20 c0       	rjmp	.+64     	; 0x44 <__bad_interrupt>
+   4:	1f c0       	rjmp	.+62     	; 0x44 <__bad_interrupt>
+   6:	1e c0       	rjmp	.+60     	; 0x44 <__bad_interrupt>
+   8:	1d c0       	rjmp	.+58     	; 0x44 <__bad_interrupt>
+   a:	1c c0       	rjmp	.+56     	; 0x44 <__bad_interrupt>
+   c:	1b c0       	rjmp	.+54     	; 0x44 <__bad_interrupt>
+   e:	1a c0       	rjmp	.+52     	; 0x44 <__bad_interrupt>
+  10:	19 c0       	rjmp	.+50     	; 0x44 <__bad_interrupt>
+  12:	18 c0       	rjmp	.+48     	; 0x44 <__bad_interrupt>
+  14:	17 c0       	rjmp	.+46     	; 0x44 <__bad_interrupt>
+  16:	16 c0       	rjmp	.+44     	; 0x44 <__bad_interrupt>
+  18:	15 c0       	rjmp	.+42     	; 0x44 <__bad_interrupt>
+  1a:	14 c0       	rjmp	.+40     	; 0x44 <__bad_interrupt>
+  1c:	13 c0       	rjmp	.+38     	; 0x44 <__bad_interrupt>
+  1e:	12 c0       	rjmp	.+36     	; 0x44 <__bad_interrupt>
+  20:	11 c0       	rjmp	.+34     	; 0x44 <__bad_interrupt>
+  22:	10 c0       	rjmp	.+32     	; 0x44 <__bad_interrupt>
+  24:	0f c0       	rjmp	.+30     	; 0x44 <__bad_interrupt>
+  26:	0e c0       	rjmp	.+28     	; 0x44 <__bad_interrupt>
+  28:	0d c0       	rjmp	.+26     	; 0x44 <__bad_interrupt>
+  2a:	0c c0       	rjmp	.+24     	; 0x44 <__bad_interrupt>
+  2c:	0b c0       	rjmp	.+22     	; 0x44 <__bad_interrupt>
+  2e:	0a c0       	rjmp	.+20     	; 0x44 <__bad_interrupt>
+  30:	09 c0       	rjmp	.+18     	; 0x44 <__bad_interrupt>
+  32:	08 c0       	rjmp	.+16     	; 0x44 <__bad_interrupt>
+
+00000034 <__ctors_end>:
+  34:	11 24       	eor	r1, r1
+  36:	1f be       	out	0x3f, r1	; 63
+  38:	cf ef       	ldi	r28, 0xFF	; 255
+  3a:	d4 e0       	ldi	r29, 0x04	; 4
+  3c:	de bf       	out	0x3e, r29	; 62
+  3e:	cd bf       	out	0x3d, r28	; 61
+  40:	10 d0       	rcall	.+32     	; 0x62 <main>
+  42:	11 c0       	rjmp	.+34     	; 0x66 <_exit>
+
+00000044 <__bad_interrupt>:
+  44:	dd cf       	rjmp	.-70     	; 0x0 <__vectors>
+
+00000046 <init_ports>:
+
+
+*/
+void init_ports(void)
+{
+	DDRB = DDRB_SETTING;
+  46:	88 e6       	ldi	r24, 0x68	; 104
+  48:	84 b9       	out	0x04, r24	; 4
+	DDRC = DDRC_SETTING;
+  4a:	8f e3       	ldi	r24, 0x3F	; 63
+  4c:	87 b9       	out	0x07, r24	; 7
+	DDRD = DDRD_SETTING;
+  4e:	1a b8       	out	0x0a, r1	; 10
+
+	MUX_SOURCE_SEL_0 = 0;		/** select MUX source 0		*/
+  50:	40 98       	cbi	0x08, 0	; 8
+	MUX_SOURCE_SEL_1 = 0;
+  52:	41 98       	cbi	0x08, 1	; 8
+	
+	AMP_ENABLE = 1;				/** unmute power amplifier	*/
+  54:	42 9a       	sbi	0x08, 2	; 8
+	
+	MUX_AUDIO_OFF = 0;			/** unmute MUX				*/
+  56:	47 98       	cbi	0x08, 7	; 8
+	
+	SPI_CLK = 0;				/** initiate Soft-SPI pins	*/
+  58:	43 98       	cbi	0x08, 3	; 8
+	SPI_DAT = 0;
+  5a:	45 98       	cbi	0x08, 5	; 8
+	SPI_CS1_ATT = 1;
+  5c:	44 9a       	sbi	0x08, 4	; 8
+	SPI_CS2_LED = 1;
+  5e:	2e 9a       	sbi	0x05, 6	; 5
+  60:	08 95       	ret
+
+00000062 <main>:
+	
+}
+
+int main(void)
+{
+	init_ports();
+  62:	f1 df       	rcall	.-30     	; 0x46 <init_ports>
+  64:	ff cf       	rjmp	.-2      	; 0x64 <main+0x2>
+
+00000066 <_exit>:
+  66:	f8 94       	cli
+
+00000068 <__stop_program>:
+  68:	ff cf       	rjmp	.-2      	; 0x68 <__stop_program>
