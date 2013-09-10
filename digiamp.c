@@ -19,10 +19,6 @@
 */
 void init_ports(void)
 {
-	DDRB = DDRB_SETTING;
-	DDRC = DDRC_SETTING;
-	DDRD = DDRD_SETTING;
-
 	MUX_SOURCE_SEL_0 = 0;		/** select MUX source 0		*/
 	MUX_SOURCE_SEL_1 = 0;
 	
@@ -34,6 +30,10 @@ void init_ports(void)
 	SPI_DAT = 0;
 	SPI_CS1_ATT = 1;
 	SPI_CS2_LED = 1;
+
+	DDRB = DDRB_SETTING;        /** set direction settings on ports */
+	DDRC = DDRC_SETTING;
+	DDRD = DDRD_SETTING;
 }
 
 /** init the timer for the scheduler cycles	*/
