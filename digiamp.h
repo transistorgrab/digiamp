@@ -59,7 +59,9 @@ struct bits {
 #define VOL_B	SBIT( PIND, 2 )	/** incremental encoder output A	*/
 
 /** port for source select switch	*/
-#define SOURCE_SW	SBIT( PIND, 3 ) /** input for source select button	*/
+#define SOURCE_BUTTON_n	SBIT( PIND, 3 ) /** input for source select button, low active	*/
+#define SOURCE_MIN		1				/** minimum allowed value for source			*/
+#define SOURCE_MAX		4				/** maximum allowed value for source			*/
 
 /** port for IR data input	*/
 #define IR_DATA		SBIT( PIND, 6 ) /** input for data from IR receiver	*/
@@ -69,4 +71,18 @@ struct bits {
 #define DDRC_SETTING	0x3F	/** Port C direction setting iioo_oooo	*/
 #define DDRD_SETTING	0x00	/** Port D direction setting	iiii_iiii */
 
-/** project functions	*/
+/** project functions prototypes	*/
+
+/** get state of current source request	*/
+int get_source(bool restart);
+
+/** get state of current volume request	*/
+int get_volume(bool restart);
+
+/** save volume and source setting to eeprom	*/
+void save_settings(int volume, int source);
+
+/** recall volume and source settings from eeprom (after power up)	*/
+int recall_volume (void);
+int recall_source (void);
+
