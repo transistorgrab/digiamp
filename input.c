@@ -1,6 +1,6 @@
 /** this file defines the input functions for source and volume	*/
 
-#include "digamp.h"
+#include "digiamp.h"
 #include <stdbool.h>
 
 /** get state of current source request	

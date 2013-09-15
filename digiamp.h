@@ -71,8 +71,15 @@ struct bits {
 #define DDRC_SETTING	0x3F	/** Port C direction setting iioo_oooo	*/
 #define DDRD_SETTING	0x00	/** Port D direction setting	iiii_iiii */
 
-/** project functions prototypes	*/
+/** operation specific defines	*/
+#define RESTART		true	/* in case of power up the restart parameter is used to recall saved settings	*/
 
+/** volume specific defines	*//
+#define MUTE_VAL	0x7F	/* sending this value to the attenuator mutes the volume setting				*/
+#define VOLUME_MIN	0x7E	/* sending this value to the attenuator sets the lowes possible volume			*/
+#define VOLUME_MAX	0x00	/* sending this value to the attenuator sets the highest possible volume		*/
+
+/** project functions prototypes	*/
 /** get state of current source request	*/
 int get_source(bool restart);
 
@@ -80,9 +87,14 @@ int get_source(bool restart);
 int get_volume(bool restart);
 
 /** save volume and source setting to eeprom	*/
-void save_settings(int volume, int source);
+void save_settings(int volume_r, int volume_l, int source);
 
 /** recall volume and source settings from eeprom (after power up)	*/
 int recall_volume (void);
 int recall_source (void);
 
+/** this function sets the LEDs via Soft SPI	*/
+void set_leds(int led_vector);
+
+/** this function sets the volume via Soft SPI	*/
+void set_volume(int volume);

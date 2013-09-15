@@ -104,6 +104,12 @@
     <Compile Include="digiamp.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="input.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="output.c">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="digiamp.h">

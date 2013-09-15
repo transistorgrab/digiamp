@@ -12,6 +12,8 @@
 *.srec
 *.mk
 *.S
+*.atsln
+*.atsuo
 Makefile
 TcfTransactionLog.csv
 Debug
