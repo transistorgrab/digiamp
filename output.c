@@ -58,7 +58,7 @@ void spi_send(uint8_t led, uint8_t volume_r, uint8_t volume_l)
 	if (led)	/** LED data should be sent	*/
 	{
 		SPI_CS2_LED = 0;	/** acitvate chip select for LEDs		*/
-		for (f=7;f==0;f--)	/** send all bits of the data MSB first	*/
+		for (f=7;f!=0;f--)	/** send all bits of the data MSB first	*/
 		{
 			if (led & 0x80)	/** if MSB is set then send 1 to the SPI data port		*/
 				SPI_DAT = 1;
