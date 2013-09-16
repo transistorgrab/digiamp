@@ -66,6 +66,7 @@ void spi_send(uint8_t led, uint8_t volume_r, uint8_t volume_l)
 				SPI_DAT = 0;
 			SPI_CLK = 1;	/** send rising edge to SPI clock port	*/
 			led <<= 1;		/** shift data 1 to the left, new MSB value	*/
+			SPI_CLK = 0;	/** send falling edge to SPI clock port	*/
 		}
 		SPI_CS2_LED = 1;	/** deactivate chip select for LEDs	*/
 	}
