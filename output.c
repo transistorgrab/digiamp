@@ -3,12 +3,13 @@
 #include "digiamp.h"
 
 /** this function sets the LEDs via Soft SPI
-    vector for Leds: 8 bit, lowes 4 = source(1..4), highest 4 = volume(5..8)
+	vector for Leds: 8 bit, lowes 4 = source(1..4), highest 4 = volume(5..8)
+	[v4,v3,v2,v1,s4,s3,s2,s1]
+
 	volume is set with inverse values: 0 = highest volume, 0x7E = lowest volume
 	volume must be converted to 4 bits according to volume,
-	all volume leds will be set at highest volume, at lowest one led will be set
-	if setting source LEDs volume parameter must be 0
-	if setting volume LEDs source parameter must be 0*/
+	all volume LEDs will be set at highest volume, at lowest, one LED will be set
+	if setting volume LEDs, source parameter must be 0, volume level can be 0	*/
 void set_leds(uint8_t source, uint8_t volume)
 {
 	static uint8_t output_vector = 0x11; /** default: 1st source, lowest volume	*/
@@ -17,34 +18,58 @@ void set_leds(uint8_t source, uint8_t volume)
 	{
 		volume_calc = (0x7F & (0xFF ^ volume));	/** invert volume value for calculation and set MSB to 0	*/
 		volume_calc /= 16;	/** highest value = 127, calculate how many leds to set (1..4)	*/
+		output_vector &= 0x0F;	/** delete all volume bits (LEDs off)	*/
+
 		switch (volume_calc)
 			case 0:		/** volume is lower or equal 12.5%, set 1 LED			*/
-				output_vector &= 0x0F;	/** delete all volume bits (LEDs off)	*/
 				output_vector |= 0x10;	/** set volume LED 1					*/
-			break;
+				break;
 			case 1:
 			case 2:
 			case 3:		/** volume is higher 12.5% and lower 50%				*/
-				output_vector &= 0x0F;	/** delete all volume bits (LEDs off)	*/
 				output_vector |= 0x30;	/** set volume LED 1 + 2				*/
-			break;
+				break;
 			case 4:
 			case 5:
 			case 6:		/** volume is higher 50% and lower 87.5%				*/
-				output_vector &= 0x0F;	/** delete all volume bits (LEDs off)	*/
 				output_vector |= 0x70;	/** set volume LED 1 + 2 + 3			*/
-			break;
+				break;
 			default:	/** volume is higher 87.5%				*/
 				output_vector |= 0xF0;	/** set all volume LEDs	*/
+	}
+	if (source)	/** set source leds	*/
+	{
+		output_vector &= 0xF0;	/** delete all source bits (source LEDs off)	*/
+
+		switch (source)
+			case 1:
+				output_vector |= 0x01;	/** set source LED 1			*/
+				break;
+			case 2:
+				output_vector |= 0x02;	/** set source LED 4			*/
+				break;
+			case 3:
+				output_vector |= 0x04;	/** set source LED 3			*/
+				break;
+			case 4:
+				output_vector |= 0x08;	/** set source LED 4			*/
+				break;
+			default:
+				output_vector |= 0x0F;	/** source value out of range, all LEDs on! alert!	*/
 	}
 	
 	spi_send(output_vector, 0, 0)
 }
 
 /** this function sets the volume via Soft SPI	*/
-void set_volume(int volume_right, int volume_left)
+void set_volume(uint8_t volume_right, uint8_t volume_left)
 {
+	uint8_t volume;
+	volume = (volume_right + volume_left)/2;	/** volume to display is the mean of r and l	*/
 	
+	spi_send(0, volume_right, volume_left);		/** send volume setting via spi to attenuator	*/
+	
+	set_leds (0,volume);	/** display new volume setting	*/
 }
 
 /** this function sends the actual data via Soft SPI
@@ -57,22 +82,40 @@ void spi_send(uint8_t led, uint8_t volume_r, uint8_t volume_l)
 {
 	if (led)	/** LED data should be sent	*/
 	{
-		SPI_CS2_LED = 0;	/** acitvate chip select for LEDs		*/
-		for (f=7;f!=0;f--)	/** send all bits of the data MSB first	*/
-		{
-			if (led & 0x80)	/** if MSB is set then send 1 to the SPI data port		*/
-				SPI_DAT = 1;
-			else			/** if MSB is not set then send 0 to the SPI data port	*/
-				SPI_DAT = 0;
-			SPI_CLK = 1;	/** send rising edge to SPI clock port	*/
-			led <<= 1;		/** shift data 1 to the left, new MSB value	*/
-			SPI_CLK = 0;	/** send falling edge to SPI clock port	*/
-		}
+		SPI_CS2_LED = 0;	/** activate chip select for LEDs	*/
+		spi_data_out(led);	/** send data to SPI port			*/
 		SPI_CS2_LED = 1;	/** deactivate chip select for LEDs	*/
 	}
 	else		/** send volume data	*/
 	{
+		SPI_CS1_ATT = 0; 	/** activate chip select for attenuator				*/
 		
+		spi_data_out(0x00);	/** "magic number" select right channel				*/
+		spi_data_out(volume_r);	/** send attenuator setting for right channel	*/
+
+		SPI_CS1_ATT = 1; 	/** deactivate chip select for attenuator			*/
+		SPI_CS1_ATT = 0; 	/** activate chip select for attenuator				*/
+		
+		spi_data_out(0x01);	/** "magic number" select left channel				*/
+		spi_data_out(volume_l);	/** send attenuator setting for left channel	*/
+		
+		SPI_CS1_ATT = 1; 	/** deactivate chip select for attenuator			*/
 	}
 	
+}
+
+/** this function puts all data bits of the data parameter to SPI_DAT MSB first
+ * and generates the SPI clock accordingly	*/
+void spi_data_out(uint8_t data)
+{
+	for (f=7;f!=0;f--)	/** send all bits of the data MSB first	*/
+	{
+		if (data & 0x80)	/** if MSB is set then send 1 to the SPI data port		*/
+			SPI_DAT = 1;
+		else				/** if MSB is not set then send 0 to the SPI data port	*/
+			SPI_DAT = 0;
+		SPI_CLK = 1;		/** send rising edge to SPI clock port	*/
+		data <<= 1;			/** shift data 1 to the left, new MSB value	*/
+		SPI_CLK = 0;		/** send falling edge to SPI clock port	*/
+	}
 }
