@@ -8,10 +8,10 @@
 	param: restart	if TRUE then the value from EEPROM is read
 	
 	returns: int value of selected source (1..4) */
-int get_source(bool restart)
+uint8_t get_source(void)
 {
-	static int source=SOURCE_MIN;	/** variable that holds the current source setting	*/
-	static bool old_button_state=true;	/** variable that holds the old value of button,
+	static uint8_t source=SOURCE_MIN;	/** variable that holds the current source setting	*/
+	static uint8_t old_button_state=1;	/** variable that holds the old value of button,
 										used to switch source only one per click	*/
 
 	if (restart)			/** after reset the old value can be recalled			*/
@@ -20,17 +20,19 @@ int get_source(bool restart)
 	{
 		if (old_button_state)	/** button was not pressed	*/
 		{
-			old_button_state = false; /** button is pressed	*/
+			old_button_state = 0; /** button is pressed	*/
 			source++;
 			if (source > SOURCE_MAX)
 				source = SOURCE_MIN;
 		}
-		else
-		{
-			old_button_state = true;
-		}
 	}
+	else	/** button is not pressed (any more)	*/
+		old_button_state = 1;
+
 }
 
 /** get state of current volume request	*/
-int get_volume(void);
+uint8_t get_volume(void)
+{
+	return;
+}

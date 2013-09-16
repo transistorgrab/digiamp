@@ -1,6 +1,7 @@
 /** this file contains all functions for output operations	*/
 
 #include "digiamp.h"
+#include <avr/eeprom.h>
 
 /** this function sets the LEDs via Soft SPI
 	vector for Leds: 8 bit, lowes 4 = source(1..4), highest 4 = volume(5..8)
@@ -61,7 +62,7 @@ void set_leds(uint8_t source, uint8_t volume)
 	spi_send(output_vector, 0, 0)
 }
 
-/** this function sets the volume via Soft SPI	*/
+/** this function sets the volume via Soft SPI and triggers the volume LED output	*/
 void set_volume(uint8_t volume_right, uint8_t volume_left)
 {
 	uint8_t volume;
@@ -118,4 +119,50 @@ void spi_data_out(uint8_t data)
 		data <<= 1;			/** shift data 1 to the left, new MSB value	*/
 		SPI_CLK = 0;		/** send falling edge to SPI clock port	*/
 	}
+}
+
+/** save volume and source setting to eeprom	*/
+void save_volume(uint8_t volume_r, uint8_t volume_l)
+{
+	eeprom_update_byte(&ee_volume_right,volume_r);
+	eeprom_update_byte(&ee_volume_left,volume_l);
+}
+
+/** save volume and source setting to eeprom	*/
+void save_source(uint8_t source)
+{
+	eeprom_update_byte(&ee_source,source);
+}
+
+/** recall volume and source settings from eeprom (after power up)	*/
+uint8_t recall_volume (uint8_t right1_or_left0)
+{
+	if (right1_or_left0)	/** >0 => read right volume value from eeprom	*/
+		return eeprom_read_byte(&ee_volume_right);
+	else					/** 0 => read left volume value from eeprom	*/
+		return eeprom_read_byte(&ee_volume_left)
+}
+
+uint8_t recall_source (void)
+{
+	return eeprom_read_byte(&ee_source);
+}
+
+/** set source for multiplexer	*/
+void set_source	(uint8_t source)
+{
+	/** mute multiplexer before switching source	*/
+	MUX_AUDIO_OFF = 1;
+	
+	if (0x01 & source)	/** filter for bit 0 */
+		MUX_SOURCE_SEL_0 = 1;	/** if bit 0 is set, output 1 to line 0	*/ 
+	else
+		MUX_SOURCE_SEL_0 = 0;	/** if bit 0 is not set, output 0 to line 0 */
+	if (0x02 & source)	/** filter for bit 1 */
+		MUX_SOURCE_SEL_1 = 1;
+	else
+		MUX_SOURCE_SEL_1 = 0;
+
+	/** unmute multiplexer before switching source	*/
+	MUX_AUDIO_OFF = 0;
 }

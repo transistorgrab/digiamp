@@ -81,20 +81,50 @@ struct bits {
 
 /** project functions prototypes	*/
 /** get state of current source request	*/
-int get_source(bool restart);
+uint8_t get_source(void);
 
 /** get state of current volume request	*/
-int get_volume(bool restart);
+uint8_t get_volume(void);
 
 /** save volume and source setting to eeprom	*/
-void save_settings(int volume_r, int volume_l, int source);
+void save_volume(uint8_t volume_r, uint8_t volume_l);
+void save_source(uint8_t source);
 
 /** recall volume and source settings from eeprom (after power up)	*/
-int recall_volume (void);
-int recall_source (void);
+uint8_t recall_volume (uint8_t right1_or_left0);	/** right = 1; left = 0	*/
+uint8_t recall_source (void);	/** since there is only one source byte there is nothing to specify	*/
 
-/** this function sets the LEDs via Soft SPI	*/
-void set_leds(int led_vector);
+/** reserves the space in EEPROM for non volatile data	*/
+uint8_t ee_volume_left;
+uint8_t ee_volume_right;
+uint8_t ee_source;
 
-/** this function sets the volume via Soft SPI	*/
-void set_volume(int volume);
+/** output functions	*/
+
+/** this function sets the LEDs via Soft SPI
+	vector for Leds: 8 bit, lowes 4 = source(1..4), highest 4 = volume(5..8)
+	[v4,v3,v2,v1,s4,s3,s2,s1]
+
+	volume is set with inverse values: 0 = highest volume, 0x7E = lowest volume
+	volume must be converted to 4 bits according to volume,
+	all volume LEDs will be set at highest volume, at lowest, one LED will be set
+	if setting volume LEDs, source parameter must be 0, volume level can be 0	*/
+void set_leds(uint8_t source, uint8_t volume);
+
+/** this function sets the volume via Soft SPI and triggers the volume LED output	*/
+void set_volume(uint8_t volume_right, uint8_t volume_left);
+
+/** this function sends the actual data via Soft SPI
+	since there are only two SPI slaves no additional efford for more universal usage is done
+	for LED SPI slave there are only 8 bit of data to be sent
+	for volume control two 8 bit values (left and right) need to be sent
+	so if the first parameter is 0 it is assumed, that volume data is to be sent
+	if the first parameter is not 0 it is asumed that LED data is to be sent*/
+void spi_send(uint8_t led, uint8_t volume_r, uint8_t volume_l);
+
+/** this function puts all data bits of the data parameter to SPI_DAT MSB first
+ * and generates the SPI clock accordingly	*/
+void spi_data_out(uint8_t data);
+
+/** set source for multiplexer	*/
+void set_source	(uint8_t source);
