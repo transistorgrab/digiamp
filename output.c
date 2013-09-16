@@ -18,24 +18,24 @@ void set_leds(uint8_t source, uint8_t volume)
 		volume_calc = (0x7F & (0xFF ^ volume));	/** invert volume value for calculation and set MSB to 0	*/
 		volume_calc /= 16;	/** highest value = 127, calculate how many leds to set (1..4)	*/
 		switch (volume_calc)
-			case 0:		/** volume is lower or equal 12.5%, set 1 LED		*/
+			case 0:		/** volume is lower or equal 12.5%, set 1 LED			*/
 				output_vector &= 0x0F;	/** delete all volume bits (LEDs off)	*/
-				output_vector |= 0x10;	/** set volume LED 1			*/
+				output_vector |= 0x10;	/** set volume LED 1					*/
 			break;
 			case 1:
 			case 2:
-			case 3:		/** volume is higher 12.5% and lower 50%		*/
+			case 3:		/** volume is higher 12.5% and lower 50%				*/
 				output_vector &= 0x0F;	/** delete all volume bits (LEDs off)	*/
-				output_vector |= 0x30;	/** set volume LED 1 + 2		*/
+				output_vector |= 0x30;	/** set volume LED 1 + 2				*/
 			break;
 			case 4:
 			case 5:
-			case 6:		/** volume is higher 50% and lower 87.5%		*/
+			case 6:		/** volume is higher 50% and lower 87.5%				*/
 				output_vector &= 0x0F;	/** delete all volume bits (LEDs off)	*/
-				output_vector |= 0x70;	/** set volume LED 1 + 2 + 3		*/
+				output_vector |= 0x70;	/** set volume LED 1 + 2 + 3			*/
 			break;
 			default:	/** volume is higher 87.5%				*/
-				output_vector |= 0xF0;	/** set all volume LEDs			*/
+				output_vector |= 0xF0;	/** set all volume LEDs	*/
 	}
 	
 	spi_send(1, output_vector)
@@ -47,8 +47,12 @@ void set_volume(int volume_right, int volume_left)
 	
 }
 
-/** this function sends the actual data via Soft SPI	*/
-void spi_send(uint8_t bytes, uint8_t byte_vector)
+/** this function sends the actual data via Soft SPI
+	since there are only two SPI slaves no additional efford for more universal usage is done
+	for LED SPI slave there are only 8 bit of data to be sent
+	for volume control two 8 bit values (left and right) need to be sent
+	so if the first parameter is 0 it is assumed, that LED data is to be sent*/
+void spi_send(uint8_t volume_r, uint8_t led_or_volume_l)
 {
-	
+	if (!volume_r)	/** LED data should be sent		*/
 }
