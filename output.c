@@ -38,7 +38,7 @@ void set_leds(uint8_t source, uint8_t volume)
 				output_vector |= 0xF0;	/** set all volume LEDs	*/
 	}
 	
-	spi_send(1, output_vector)
+	spi_send(output_vector, 0, 0)
 }
 
 /** this function sets the volume via Soft SPI	*/
@@ -51,8 +51,27 @@ void set_volume(int volume_right, int volume_left)
 	since there are only two SPI slaves no additional efford for more universal usage is done
 	for LED SPI slave there are only 8 bit of data to be sent
 	for volume control two 8 bit values (left and right) need to be sent
-	so if the first parameter is 0 it is assumed, that LED data is to be sent*/
-void spi_send(uint8_t volume_r, uint8_t led_or_volume_l)
+	so if the first parameter is 0 it is assumed, that volume data is to be sent
+	if the first parameter is not 0 it is asumed that LED data is to be sent*/
+void spi_send(uint8_t led, uint8_t volume_r, uint8_t volume_l)
 {
-	if (!volume_r)	/** LED data should be sent		*/
+	if (led)	/** LED data should be sent	*/
+	{
+		SPI_CS2_LED = 0;	/** acitvate chip select for LEDs		*/
+		for (f=7;f==0;f--)	/** send all bits of the data MSB first	*/
+		{
+			if (led & 0x80)	/** if MSB is set then send 1 to the SPI data port		*/
+				SPI_DAT = 1;
+			else			/** if MSB is not set then send 0 to the SPI data port	*/
+				SPI_DAT = 0;
+			SPI_CLK = 1;	/** send rising edge to SPI clock port	*/
+			led <<= 1;		/** shift data 1 to the left, new MSB value	*/
+		}
+		SPI_CS2_LED = 1;	/** deactivate chip select for LEDs	*/
+	}
+	else		/** send volume data	*/
+	{
+		
+	}
+	
 }
