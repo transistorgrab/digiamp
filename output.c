@@ -148,14 +148,18 @@ uint8_t recall_source (void)
 	return eeprom_read_byte(&ee_source);
 }
 
-/** set source for multiplexer	*/
+/** set source for multiplexer
+ * source values: 1..4 map to output values 0x00..0x03	*/
+*/
 void set_source	(uint8_t source)
 {
+	source--;	/** reduce source value for easier filtering	*/
+
 	/** mute multiplexer before switching source	*/
 	MUX_AUDIO_OFF = 1;
 	
 	if (0x01 & source)	/** filter for bit 0 */
-		MUX_SOURCE_SEL_0 = 1;	/** if bit 0 is set, output 1 to line 0	*/ 
+		MUX_SOURCE_SEL_0 = 1;	/** if bit 0 is set, output 0 to line 0	*/ 
 	else
 		MUX_SOURCE_SEL_0 = 0;	/** if bit 0 is not set, output 0 to line 0 */
 	if (0x02 & source)	/** filter for bit 1 */
