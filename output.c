@@ -22,6 +22,7 @@ void set_leds(uint8_t source, uint8_t volume)
 		output_vector &= 0x0F;	/** delete all volume bits (LEDs off)	*/
 
 		switch (volume_calc)
+		{
 			case 0:		/** volume is lower or equal 12.5%, set 1 LED			*/
 				output_vector |= 0x10;	/** set volume LED 1					*/
 				break;
@@ -37,12 +38,14 @@ void set_leds(uint8_t source, uint8_t volume)
 				break;
 			default:	/** volume is higher 87.5%				*/
 				output_vector |= 0xF0;	/** set all volume LEDs	*/
+		}
 	}
 	if (source)	/** set source leds	*/
 	{
 		output_vector &= 0xF0;	/** delete all source bits (source LEDs off)	*/
 
 		switch (source)
+		{
 			case 1:
 				output_vector |= 0x01;	/** set source LED 1			*/
 				break;
@@ -57,9 +60,10 @@ void set_leds(uint8_t source, uint8_t volume)
 				break;
 			default:
 				output_vector |= 0x0F;	/** source value out of range, all LEDs on! alert!	*/
+		}
 	}
 	
-	spi_send(output_vector, 0, 0)
+	spi_send(output_vector, 0, 0);
 }
 
 /** this function sets the volume via Soft SPI and triggers the volume LED output	*/
@@ -109,6 +113,7 @@ void spi_send(uint8_t led, uint8_t volume_r, uint8_t volume_l)
  * and generates the SPI clock accordingly	*/
 void spi_data_out(uint8_t data)
 {
+	uint8_t f;	/** loop variable	*/
 	for (f=7;f!=0;f--)	/** send all bits of the data MSB first	*/
 	{
 		if (data & 0x80)	/** if MSB is set then send 1 to the SPI data port		*/
@@ -140,7 +145,7 @@ uint8_t recall_volume (uint8_t right1_or_left0)
 	if (right1_or_left0)	/** >0 => read right volume value from eeprom	*/
 		return eeprom_read_byte(&ee_volume_right);
 	else					/** 0 => read left volume value from eeprom	*/
-		return eeprom_read_byte(&ee_volume_left)
+		return eeprom_read_byte(&ee_volume_left);
 }
 
 uint8_t recall_source (void)
@@ -150,7 +155,6 @@ uint8_t recall_source (void)
 
 /** set source for multiplexer
  * source values: 1..4 map to output values 0x00..0x03	*/
-*/
 void set_source	(uint8_t source)
 {
 	source--;	/** reduce source value for easier filtering	*/

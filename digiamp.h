@@ -1,16 +1,8 @@
 /** project file for all project specific defines and functions	*/
 /** project uses ATMEGA88AU (http://www.atmel.com/images/doc2545.pdf)	*/
 
-/** LEDs	*/
-#define LED_SOURCE_1
-#define LED_SOURCE_2
-#define LED_SOURCE_3
-#define LED_SOURCE_4
+#include <stdint.h>	/** unsignet data types	*/
 
-#define LED_VOLUME_1
-#define LED_VOLUME_2
-#define LED_VOLUME_3
-#define LED_VOLUME_4
 
 /** defines for ports **
 **
@@ -74,9 +66,9 @@ struct bits {
 /** operation specific defines	*/
 #define RESTART		true	/* in case of power up the restart parameter is used to recall saved settings	*/
 
-/** volume specific defines	*//
+/** volume specific defines	*/
 #define MUTE_VAL	0x7F	/* sending this value to the attenuator mutes the volume setting				*/
-#define VOLUME_MIN	0x7E	/* sending this value to the attenuator sets the lowes possible volume			*/
+#define VOLUME_MIN	0x7E	/* sending this value to the attenuator sets the lowest possible volume			*/
 #define VOLUME_MAX	0x00	/* sending this value to the attenuator sets the highest possible volume		*/
 
 /** project functions prototypes	*/
@@ -84,7 +76,7 @@ struct bits {
 uint8_t get_source(void);
 
 /** get state of current volume request	*/
-uint8_t get_volume(void);
+uint8_t get_volume(int8_t value);
 
 /** save volume and source setting to eeprom	*/
 void save_volume(uint8_t volume_r, uint8_t volume_l);
