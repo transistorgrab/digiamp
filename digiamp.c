@@ -12,31 +12,6 @@
 
 
 
-
-/** \brief: initiates all controller pins for input or output
-
-
-*/
-void init_ports(void)
-{
-	MUX_SOURCE_SEL_0 = 0;		/** select MUX source 0		*/
-	MUX_SOURCE_SEL_1 = 0;
-	
-	AMP_ENABLE = 1;				/** unmute power amplifier	*/
-	
-	MUX_AUDIO_OFF = 0;			/** unmute MUX				*/
-	
-	SPI_CLK = 0;				/** initiate Soft-SPI pins	*/
-	SPI_DAT = 0;
-	SPI_CS1_ATT = 1;
-	SPI_CS2_LED = 1;
-
-	DDRB = DDRB_SETTING;        /** set direction settings on ports */
-	DDRC = DDRC_SETTING;
-	DDRD = DDRD_SETTING;
-}
-
-
 /** this function loads the settings for volume and source from the eeprom
  * and restores the settings. sets volume and source to the last saved state	*/
 void restore_settings(void)
@@ -50,6 +25,24 @@ void restore_settings(void)
 	set_volume(recall_volume(1),recall_volume(0));	/* first start may be very loud...	*/
 }
 
+/** \brief: initiates all controller pins for input or output
+*/
+void init_ports(void)
+{
+	restore_settings();	/** restore source and volume settings	*/
+
+	AMP_ENABLE = 1;				/** unmute power amplifier	*/
+	
+	SPI_CLK = 0;				/** initiate Soft-SPI pins	*/
+	SPI_DAT = 0;
+	SPI_CS1_ATT = 1;
+	SPI_CS2_LED = 1;
+
+	DDRB = DDRB_SETTING;        /** set direction settings on ports */
+	DDRC = DDRC_SETTING;
+	DDRD = DDRD_SETTING;
+}
+
 /** init the timer for the scheduler cycles	*/
 void init_timer(void)
 {
@@ -59,7 +52,6 @@ void init_timer(void)
 int main(void)
 {
 	init_ports();
-	restore_settings();
 	init_timer();
 	
     while(1)
