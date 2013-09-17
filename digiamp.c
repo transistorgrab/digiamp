@@ -36,6 +36,20 @@ void init_ports(void)
 	DDRD = DDRD_SETTING;
 }
 
+
+/** this function loads the settings for volume and source from the eeprom
+ * and restores the settings. sets volume and source to the last saved state	*/
+void restore_settings(void)
+{
+	uint8_t temp;
+	if (temp = eeprom_read_byte(&ee_source)) /** yes, thats right, that is a "="	*/
+		set_source(temp);	/* if there is a value stored, restore it	*/
+	else
+		set_source(1);		/* if there is no value stored, set source to 1	*/
+
+	set_volume(recall_volume(1),recall_volume(0));	/* first start may be very loud...	*/
+}
+
 /** init the timer for the scheduler cycles	*/
 void init_timer(void)
 {
@@ -45,6 +59,7 @@ void init_timer(void)
 int main(void)
 {
 	init_ports();
+	restore_settings();
 	init_timer();
 	
     while(1)
