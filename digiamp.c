@@ -17,7 +17,7 @@
 void restore_settings(void)
 {
 	uint8_t temp;
-	if (temp = eeprom_read_byte(&ee_source)) /** yes, thats right, that is a "="	*/
+	if (temp = recall_source())	/** yes, thats right, that is a "="	*/
 		set_source(temp);	/* if there is a value stored, restore it	*/
 	else
 		set_source(1);		/* if there is no value stored, set source to 1	*/
