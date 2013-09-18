@@ -4,6 +4,9 @@
  * Created: 09.09.2013 21:10:27
  *  Author: transistorgrab
  */ 
+#ifndef F_CPU
+#define F_CPU 1000000UL //factory default clock value
+#endif
 
 #include <avr/io.h>
 #include <avr/iomx8.h>
