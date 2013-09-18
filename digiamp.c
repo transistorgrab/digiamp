@@ -15,8 +15,11 @@
  * and restores the settings. sets volume and source to the last saved state	*/
 void restore_settings(void)
 {
+	AMP_ENABLE = 0;	/** mute power amplifier	*/
+
 	uint8_t temp;
 	temp = recall_source();
+
 	if (temp)	/** is there a source value	*/
 		set_source(temp);	/** if there is a value stored, restore it	*/
 	else
@@ -25,15 +28,16 @@ void restore_settings(void)
 	temp=recall_volume(1);	/** used twice	*/
 	set_volume(temp,recall_volume(0));	/** first start may be very loud...		*/
 	get_volume(temp);		/** send volume setting to volume changing function	*/
+
+	AMP_ENABLE = 1;	/** unmute power amplifier	*/
 }
 
 /** \brief: initiates all controller pins for input or output
 */
 void init_ports(void)
 {
-	restore_settings();	/** restore source and volume settings	*/
 
-	AMP_ENABLE = 1;				/** unmute power amplifier	*/
+	AMP_ENABLE = 0;				/** mute power amplifier	*/
 	
 	SPI_CLK = 0;				/** initiate Soft-SPI pins	*/
 	SPI_DAT = 0;
@@ -63,8 +67,10 @@ int main(void)
 {
 	init_ports();
 	init_timer();
+	restore_settings();	/** restore source and volume settings, must be done after port initialisation	*/
+
 	
-	sei();
+	sei();	/** global enabling of interrupts	*/
     while(1)
     {
         //TODO:: Please write your application code 
