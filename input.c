@@ -39,11 +39,8 @@ uint8_t get_volume(int8_t value)
 	
 	if(value)	/** request to change volume up or down	*/
 	{
-		if (value > 0)	/** volume up	*/
-		{
-			if (!((volume_r <= VOLUME_MAX)||(volume_r >= VOLUME_MIN))) /** remember: volume is negative proportional to volume value, allow no overflow */
-				volume_r -= value;	/** "add" value to current volume	*/
-		}
+		if (!((volume_r <= VOLUME_MAX)||(volume_r >= VOLUME_MIN))) /** remember: volume is negative proportional to volume value, allow no overflow */
+			volume_r -= value;	/** "add" value to current volume	*/
 	}
 	return volume_r;	/** send current setting back	*/
 }
