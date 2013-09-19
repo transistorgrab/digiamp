@@ -114,7 +114,7 @@ void spi_send(uint8_t led, uint8_t volume_r, uint8_t volume_l)
 void spi_data_out(uint8_t data)
 {
 	uint8_t f;	/** loop variable	*/
-	for (f=7;f!=0;f--)	/** send all bits of the data MSB first	*/
+	for (f=8;f!=0;f--)	/** send all bits of the data MSB first	*/
 	{
 		if (data & 0x80)	/** if MSB is set then send 1 to the SPI data port		*/
 			SPI_DAT = 1;

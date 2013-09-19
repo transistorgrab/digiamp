@@ -4,6 +4,9 @@
  * Created: 09.09.2013 21:10:27
  *  Author: transistorgrab
  */ 
+#ifndef F_CPU
+#define F_CPU 1000000UL //factory default clock value
+#endif
 
 #include <avr/io.h>
 #include <avr/iomx8.h>
@@ -17,8 +20,10 @@ void restore_settings(void)
 {
 	AMP_ENABLE = 0;	/** mute power amplifier	*/
 
-	uint8_t temp;
+	uint8_t temp, temp1;
 	temp = recall_source();
+	if (temp == 255)	/** default value from empty eeprom	*/
+		temp = SOURCE_MIN;	/** set useful value	*/
 
 	if (temp)	/** is there a source value	*/
 		set_source(temp);	/** if there is a value stored, restore it	*/
@@ -26,7 +31,12 @@ void restore_settings(void)
 		set_source(1);		/** if there is no value stored, set source to 1	*/
 
 	temp=recall_volume(1);	/** used twice	*/
-	set_volume(temp,recall_volume(0));	/** first start may be very loud...		*/
+	if (temp == 255)	/** default value from empty eeprom	*/
+		temp = VOLUME_MIN;	/** set useful value	*/
+	temp1=recall_volume(0);	/** recall value for left volume	*/
+	if (temp1 == 255)	/** defaul value from empty eeprom	*/
+		temp1 = VOLUME_MIN;	/** set useful value	*/
+	set_volume(temp,recall_volume(0));	/** set recalled volume value			*/
 	get_volume(temp);		/** send volume setting to volume changing function	*/
 
 	AMP_ENABLE = 1;	/** unmute power amplifier	*/
