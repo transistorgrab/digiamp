@@ -37,7 +37,7 @@ struct bits {
 #define SPI_CS2_LED		SBIT( PORTB, 6 )	/** SPI for LEDs		*/
 
 /** ports for Multiplexer control, outputs	*/
-#define MUX_AUDIO_OFF		SBIT( PORTC, 7 )	/** disables output signal from multiplexer	*/
+#define MUX_AUDIO_OFF		SBIT( PORTB, 7 )	/** disables output signal from multiplexer	*/
 #define MUX_SOURCE_SEL_0	SBIT( PORTC, 0 )	/** multiplexer select signal bit 0			*/
 #define MUX_SOURCE_SEL_1	SBIT( PORTC, 1 )	/** multiplexer select signal bit 1			*/
 
@@ -59,7 +59,7 @@ struct bits {
 #define IR_DATA		SBIT( PIND, 6 ) /** input for data from IR receiver	*/
 
 /** direction defines according to above defines: 0=input, 1=output	*/
-#define DDRB_SETTING	0x68	/** Port B direction setting iooi_oiii	*/
+#define DDRB_SETTING	0xE8	/** Port B direction setting oooi_oiii	*/
 #define DDRC_SETTING	0x3F	/** Port C direction setting iioo_oooo	*/
 #define DDRD_SETTING	0x00	/** Port D direction setting	iiii_iiii */
 
@@ -73,10 +73,10 @@ struct bits {
 
 /** project functions prototypes	*/
 /** get state of current source request	*/
-uint8_t get_source(void);
+uint8_t get_source(uint8_t startup);
 
-/** get state of current volume request	*/
-uint8_t get_volume(int8_t value);
+/** get state of current volume request and store a given absolute value	*/
+uint8_t get_volume(int8_t value, uint8_t startup_value);
 
 /** save volume and source setting to eeprom	*/
 void save_volume(uint8_t volume_r, uint8_t volume_l);

@@ -70,7 +70,7 @@ void set_leds(uint8_t source, uint8_t volume)
 void set_volume(uint8_t volume_right, uint8_t volume_left)
 {
 	uint8_t volume;
-	volume = (volume_right + volume_left)/2;	/** volume to display is the mean of r and l	*/
+	volume = (volume_right/2 + volume_left/2);	/** volume to display is the mean of r and l	*/
 	
 	spi_send(0, volume_right, volume_left);		/** send volume setting via spi to attenuator	*/
 	
@@ -157,6 +157,8 @@ uint8_t recall_source (void)
  * source values: 1..4 map to output values 0x00..0x03	*/
 void set_source	(uint8_t source)
 {
+	set_leds(source,0);	/** set leds to display selected source	*/
+	
 	source--;	/** reduce source value for easier filtering	*/
 
 	/** mute multiplexer before switching source	*/

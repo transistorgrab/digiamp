@@ -26,18 +26,26 @@ void restore_settings(void)
 		temp = SOURCE_MIN;	/** set useful value	*/
 
 	if (temp)	/** is there a source value	*/
+	{
 		set_source(temp);	/** if there is a value stored, restore it	*/
+		get_source(temp);	/** send restored value to the source switching function	*/
+	}
 	else
+	{
 		set_source(1);		/** if there is no value stored, set source to 1	*/
+		get_source(temp);	/** send restored value to the source switching function	*/
+	}
 
 	temp=recall_volume(1);	/** used twice	*/
 	if (temp == 255)	/** default value from empty eeprom	*/
 		temp = VOLUME_MIN;	/** set useful value	*/
 	temp1=recall_volume(0);	/** recall value for left volume	*/
-	if (temp1 == 255)	/** defaul value from empty eeprom	*/
+	if (temp1 == 255)	/** default value from empty eeprom	*/
 		temp1 = VOLUME_MIN;	/** set useful value	*/
-	set_volume(temp,recall_volume(0));	/** set recalled volume value			*/
-	get_volume(temp);		/** send volume setting to volume changing function	*/
+	/** DEBUG	*/
+	temp = temp1 = 0; /** maximum setting !!*/
+	set_volume(temp,temp1);	/** set recalled volume value			*/
+	get_volume(0,temp);		/** send volume setting to volume changing function	*/
 
 	AMP_ENABLE = 1;	/** unmute power amplifier	*/
 }
@@ -69,7 +77,7 @@ void init_timer(void)
 	TCCR0A |= 0x02;	/** set CTC mode	*/
 	TCCR0B |= 0x04;	/** set prescaler to 256	*/
 	OCR0A  = 39;		/** at 1 MHz clock: (1000000 Hz)/ 256 / (100 Hz) = 39 counter tics	*/
-	TIMSK0 |= 0x01;	/** activate timer overflow interrupt	*/
+	TIMSK0 |= 0x02;	/** activate timer compare match A interrupt	*/
 	
 }
 
@@ -92,9 +100,9 @@ ISR (TIMER0_COMPA_vect)
 {
 	uint8_t volume;	/** for the time being there is no balance setting, so volume right and left are the same	*/
 	uint8_t source;
-	source = get_source();
-	set_source(source);
-	volume = get_volume(0);
+	source = get_source(0); /** which source should be set	*/
+	set_source(source);		/** set MUX to source			*/
+	volume = get_volume(0,0);
 	set_volume(volume, volume);
 	/** save latest values to EEPROM	*/
 	save_volume(volume, volume);
@@ -110,7 +118,7 @@ ISR (TIMER0_COMPA_vect)
 ISR (INT0_vect) /** interrupt is activated at rising edge of VOL_B	*/
 {
 	if(VOL_A)			/** clock wise turn						*/
-		get_volume(1);	/** increase volume						*/
+		get_volume(1,0);	/** increase volume						*/
 	else				/** VOL_A is 0, counter clock wise turn	*/
-		get_volume(-1); /** decrease volume						*/
+		get_volume(-1,0); /** decrease volume						*/
 }
