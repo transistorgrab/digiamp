@@ -68,6 +68,7 @@ void init_ports(void)
 	
 	EICRA |= 0x03;	/** set external interrupt 0 at rising edge	*/
 	EIMSK |= 0x01;	/** activate external interrupt 0	*/
+	EIFR  |= 0x01;	/** activate execution of interrupt 0	*/
 }
 
 /** init the timer for the scheduler cycles
@@ -98,6 +99,7 @@ int main(void)
 /** timer interrupt, do everything from catching input values to setting outputs	*/
 ISR (TIMER0_COMPA_vect)
 {
+	sei();	/** enable global interrupts (volume setting)	*/
 	uint8_t volume;	/** for the time being there is no balance setting, so volume right and left are the same	*/
 	uint8_t source;
 	source = get_source(0); /** which source should be set	*/
