@@ -17,3 +17,6 @@
 Makefile
 TcfTransactionLog.csv
 Debug
+Doxyfile
+html
+latex

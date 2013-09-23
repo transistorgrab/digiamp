@@ -48,7 +48,8 @@ struct bits {
 
 /** ports for incremental encoder, inputs	*/
 #define VOL_A	SBIT( PIND, 1 )	/** incremental encoder output A	*/
-#define VOL_B	SBIT( PIND, 2 )	/** incremental encoder output A	*/
+#define VOL_B	SBIT( PIND, 2 )	/** incremental encoder output B	*/
+#define VOL_B_PU	SBIT( PORTD, 2 )	/** pull up for Port D(2)	*/
 
 /** port for source select switch	*/
 #define SOURCE_BUTTON_n	SBIT( PIND, 3 ) /** input for source select button, low active	*/

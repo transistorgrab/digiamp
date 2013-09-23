@@ -66,9 +66,10 @@ void init_ports(void)
 	DDRC = DDRC_SETTING;
 	DDRD = DDRD_SETTING;
 	
-	EICRA |= 0x03;	/** set external interrupt 0 at rising edge	*/
-	EIMSK |= 0x01;	/** activate external interrupt 0	*/
 	EIFR  |= 0x01;	/** activate execution of interrupt 0	*/
+	EIMSK |= 0x01;	/** activate external interrupt 0	*/
+	EICRA |= 0x03;	/** set external interrupt 0 at rising edge	*/
+//	VOL_B_PU = 1;	/** activate pullup for Port D.2	*/
 }
 
 /** init the timer for the scheduler cycles
