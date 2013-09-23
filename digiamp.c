@@ -42,8 +42,6 @@ void restore_settings(void)
 	temp1=recall_volume(0);	/** recall value for left volume	*/
 	if (temp1 == 255)	/** default value from empty eeprom	*/
 		temp1 = VOLUME_MIN;	/** set useful value	*/
-	/** DEBUG	*/
-	temp = temp1 = 0; /** maximum setting !!*/
 	set_volume(temp,temp1);	/** set recalled volume value			*/
 	get_volume(0,temp);		/** send volume setting to volume changing function	*/
 
@@ -66,7 +64,7 @@ void init_ports(void)
 	DDRC = DDRC_SETTING;
 	DDRD = DDRD_SETTING;
 	
-	EIFR  |= 0x01;	/** activate execution of interrupt 0	*/
+//	EIFR  |= 0x01;	/** activate execution of interrupt 0	*/
 	EIMSK |= 0x01;	/** activate external interrupt 0	*/
 	EICRA |= 0x03;	/** set external interrupt 0 at rising edge	*/
 //	VOL_B_PU = 1;	/** activate pullup for Port D.2	*/

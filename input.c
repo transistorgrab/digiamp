@@ -43,8 +43,21 @@ uint8_t get_volume(int8_t value, uint8_t startup_value)
 		volume_r = startup_value;
 	if(value)	/** request to change volume up or down	*/
 	{
-		if (!((volume_r <= VOLUME_MAX)||(volume_r >= VOLUME_MIN))) /** remember: volume is negative proportional to volume value, allow no overflow */
-			volume_r -= value;	/** "add" value to current volume	*/
+		/** remember: volume is negative proportional to volume value, allow no overflow */
+		/** limit volume settings	*/
+		if ((volume_r <= VOLUME_MAX) && (value > 0))	/** do not allow volume settings < 0 (volume max)	*/
+		{
+			volume_r = VOLUME_MAX;
+			return volume_r;
+		}
+		if ((volume_r >= MUTE_VAL) && (value < 0))	/** do not allow volume setting > 127 (mute)	*/
+		{
+			volume_r = MUTE_VAL;
+			return volume_r;
+		}
+		
+		/** change volume	*/
+		volume_r -= value;	/** "add" value to current volume	*/
 	}
 	return volume_r;	/** send current setting back	*/
 }
