@@ -1,7 +1,7 @@
 /** project file for all project specific defines and functions	*/
 /** project uses ATMEGA88AU (http://www.atmel.com/images/doc2545.pdf)	*/
 
-#include <stdint.h>	/** unsignet data types	*/
+#include <stdint.h>	/** unsigned data types	*/
 
 
 /** defines for ports **
@@ -9,7 +9,7 @@
 ** hardware pin configuration:
 ** all not defined ports are not used or not available	*/
 
-/** function and struct for setting single port bits	
+/** struct and define for setting single port bits with simple statements
     source: [http://www.mikrocontroller.net/attachment/27445/SBIT.C] */
 struct bits {
 	uint8_t b0:1;
@@ -48,7 +48,7 @@ struct bits {
 
 /** ports for incremental encoder, inputs	*/
 #define VOL_A	SBIT( PIND, 1 )	/** incremental encoder output A	*/
-#define VOL_B	SBIT( PIND, 2 )	/** incremental encoder output A	*/
+#define VOL_B	SBIT( PIND, 2 )	/** incremental encoder output B	*/
 
 /** port for source select switch	*/
 #define SOURCE_BUTTON_n	SBIT( PIND, 3 ) /** input for source select button, low active	*/
@@ -61,7 +61,7 @@ struct bits {
 /** direction defines according to above defines: 0=input, 1=output	*/
 #define DDRB_SETTING	0xE8	/** Port B direction setting oooi_oiii	*/
 #define DDRC_SETTING	0x3F	/** Port C direction setting iioo_oooo	*/
-#define DDRD_SETTING	0x00	/** Port D direction setting	iiii_iiii */
+#define DDRD_SETTING	0x00	/** Port D direction setting iiii_iiii */
 
 /** operation specific defines	*/
 #define RESTART		true	/* in case of power up the restart parameter is used to recall saved settings	*/
