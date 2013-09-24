@@ -104,7 +104,7 @@ ISR (TIMER0_COMPA_vect)
 	static int8_t last_source;	/** prevent sound noise by setting source to the same value	*/
 
 	source = get_source(0); /** which source should be set	*/
-	if (source - last_source)	/** if both are equal do not call set_source	*/
+	if (!(source == last_source))	/** if both are equal do not call set_source	*/
 	{
 		set_source(source);		/** set MUX to source		*/
 		last_source = source;	/** remember current source	*/
