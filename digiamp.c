@@ -101,7 +101,7 @@ ISR (TIMER0_COMPA_vect)
 	sei();	/** enable global interrupts (volume setting)	*/
 	uint8_t volume;	/** for the time being there is no balance setting, so volume right and left are the same	*/
 	uint8_t source;
-	static int8_t last_source;	/** prevent sound noise by setting source to the same value	*/
+	static uint8_t last_source;	/** prevent sound noise by setting source to the same value	*/
 
 	source = get_source(0); /** which source should be set	*/
 	if (!(source == last_source))	/** if both are equal do not call set_source	*/
