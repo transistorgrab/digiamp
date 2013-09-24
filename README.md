@@ -1,4 +1,4 @@
 digiamp
 =======
 
-firmware for a AVR controlled digital amplifier
+firmware for an AVR controlled digital amplifier
