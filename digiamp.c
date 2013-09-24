@@ -45,7 +45,6 @@ void restore_settings(void)
 	set_volume(temp,temp1);	/** set recalled volume value			*/
 	get_volume(0,temp);		/** send volume setting to volume changing function	*/
 
-	AMP_ENABLE = 1;	/** unmute power amplifier	*/
 }
 
 /** \brief: initiates all controller pins for input or output
@@ -64,10 +63,8 @@ void init_ports(void)
 	DDRC = DDRC_SETTING;
 	DDRD = DDRD_SETTING;
 	
-//	EIFR  |= 0x01;	/** activate execution of interrupt 0	*/
 	EIMSK |= 0x01;	/** activate external interrupt 0	*/
 	EICRA |= 0x03;	/** set external interrupt 0 at rising edge	*/
-//	VOL_B_PU = 1;	/** activate pullup for Port D.2	*/
 }
 
 /** init the timer for the scheduler cycles
@@ -99,9 +96,10 @@ int main(void)
 ISR (TIMER0_COMPA_vect)
 {
 	sei();	/** enable global interrupts (volume setting)	*/
+	static uint8_t startup_delay=100;	/** switching the power amplifier on after full startup of power supply 100 = 1s@100 Hz*/
 	uint8_t volume;	/** for the time being there is no balance setting, so volume right and left are the same	*/
 	uint8_t source;
-	static uint8_t last_source;	/** prevent sound noise by setting source to the same value	*/
+	static uint8_t last_source, last_volume;	/** prevent sound noise by setting source to the same value	*/
 
 	source = get_source(0); /** which source should be set	*/
 	if (!(source == last_source))	/** if both are equal do not call set_source	*/
@@ -110,10 +108,22 @@ ISR (TIMER0_COMPA_vect)
 		last_source = source;	/** remember current source	*/
 	}
 	volume = get_volume(0,0);
-	set_volume(volume, volume);
-	/** save latest values to EEPROM	*/
-	save_volume(volume, volume);
-	save_source(source);
+	if (!(volume == last_volume))
+	{
+		set_volume(volume, volume);
+		/** save latest values to EEPROM	*/
+		save_volume(volume, volume);
+		save_source(source);
+		last_volume = volume;
+	}
+	
+	if (startup_delay)
+	{
+		set_leds(0,0);
+		startup_delay--;
+		if(!startup_delay)
+			AMP_ENABLE = 1;	/** unmute power amplifier	*/
+	}
 }
 
 /** external interrupt 0 is bound to a incremental encoder,
