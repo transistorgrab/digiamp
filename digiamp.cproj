@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectVersion>6.1</ProjectVersion>
+    <ProjectVersion>6.2</ProjectVersion>
     <ToolchainName>com.Atmel.AVRGCC8.C</ToolchainName>
     <ProjectGuid>{7da15736-a283-4679-aab2-dd4b9e5cccf9}</ProjectGuid>
     <avrdevice>ATmega88A</avrdevice>
@@ -21,9 +21,8 @@
     <OverrideVtorValue>exception_table</OverrideVtorValue>
     <eraseonlaunchrule>0</eraseonlaunchrule>
     <AsfVersion>3.1.3</AsfVersion>
-    <avrtool>com.atmel.avrdbg.tool.simulator</avrtool>
-    <avrtoolinterface>
-    </avrtoolinterface>
+    <avrtool>com.atmel.avrdbg.tool.ispmk2</avrtool>
+    <avrtoolinterface>ISP</avrtoolinterface>
     <com_atmel_avrdbg_tool_simulator>
       <ToolType>com.atmel.avrdbg.tool.simulator</ToolType>
       <ToolName>Simulator</ToolName>
@@ -36,7 +35,6 @@
       </Channel>
       <ToolOptions>
         <InterfaceProperties>
-          <JtagEnableExtResetOnStartSession>false</JtagEnableExtResetOnStartSession>
         </InterfaceProperties>
         <InterfaceName>
         </InterfaceName>
@@ -49,15 +47,15 @@
     <BootSegment>2</BootSegment>
     <AsfFrameworkConfig>
       <framework-data>
-        <options />
-        <configurations />
-        <files />
-        <documentation help="" />
-        <offline-documentation help="" />
-        <dependencies>
-          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.3.0" />
-        </dependencies>
-      </framework-data>
+  <options />
+  <configurations />
+  <files />
+  <documentation help="" />
+  <offline-documentation help="" />
+  <dependencies>
+    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.10.1" />
+  </dependencies>
+</framework-data>
     </AsfFrameworkConfig>
     <com_atmel_avrdbg_tool_ispmk2>
       <ToolOptions>
@@ -71,6 +69,7 @@
       <ToolNumber>000200163447</ToolNumber>
       <ToolName>AVRISP mkII</ToolName>
     </com_atmel_avrdbg_tool_ispmk2>
+    <preserveEEPROM>true</preserveEEPROM>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <ToolchainSettings>

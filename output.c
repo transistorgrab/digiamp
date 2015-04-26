@@ -165,7 +165,7 @@ void set_source	(uint8_t source)
 	MUX_AUDIO_OFF = 1;
 	
 	if (0x01 & source)	/** filter for bit 0 */
-		MUX_SOURCE_SEL_0 = 1;	/** if bit 0 is set, output 0 to line 0	*/ 
+		MUX_SOURCE_SEL_0 = 1;	/** if bit 0 is set, output 1 to line 0	*/ 
 	else
 		MUX_SOURCE_SEL_0 = 0;	/** if bit 0 is not set, output 0 to line 0 */
 	if (0x02 & source)	/** filter for bit 1 */
@@ -173,6 +173,6 @@ void set_source	(uint8_t source)
 	else
 		MUX_SOURCE_SEL_1 = 0;
 
-	/** unmute multiplexer before switching source	*/
+	/** unmute multiplexer after switching source	*/
 	MUX_AUDIO_OFF = 0;
 }

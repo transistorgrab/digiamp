@@ -41,23 +41,22 @@ uint8_t get_volume(int8_t value, uint8_t startup_value)
 	static uint8_t volume_r;	/** current state: only one volume setting for both channels	*/
 	if (startup_value)			/** on startup a from eeprom restored value is given			*/
 		volume_r = startup_value;
-	if(value)	/** request to change volume up or down	*/
+
+	/** change volume	*/
+	volume_r -= value;	/** "add" value to current volume	*/
+
+	/** remember: volume is negative proportional to volume value, allow no overflow */
+	/** limit volume settings	*/
+	if ((volume_r <= VOLUME_MAX) && (value > 0))	/** do not allow volume settings < 0 (volume max)	*/
 	{
-		/** remember: volume is negative proportional to volume value, allow no overflow */
-		/** limit volume settings	*/
-		if ((volume_r <= VOLUME_MAX) && (value > 0))	/** do not allow volume settings < 0 (volume max)	*/
-		{
-			volume_r = VOLUME_MAX;
-			return volume_r;
-		}
-		if ((volume_r >= MUTE_VAL) && (value < 0))	/** do not allow volume setting > 127 (mute)	*/
-		{
-			volume_r = MUTE_VAL;
-			return volume_r;
-		}
-		
-		/** change volume	*/
-		volume_r -= value;	/** "add" value to current volume	*/
+		volume_r = VOLUME_MAX;
+		return volume_r;
 	}
+	if ((volume_r >= MUTE_VAL) && (value < 0))	/** do not allow volume setting > 127 (mute)	*/
+	{
+		volume_r = MUTE_VAL;
+		return volume_r;
+	}
+		
 	return volume_r;	/** send current setting back	*/
 }

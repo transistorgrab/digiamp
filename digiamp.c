@@ -99,7 +99,7 @@ ISR (TIMER0_COMPA_vect)
 	static uint8_t startup_delay=100;	/** switching the power amplifier on after full startup of power supply 100 = 1s@100 Hz*/
 	uint8_t volume;	/** for the time being there is no balance setting, so volume right and left are the same	*/
 	uint8_t source;
-	static uint8_t last_source, last_volume;	/** prevent sound noise by setting source to the same value	*/
+	static uint8_t last_source, last_volume;	/** prevent sound noise caused by setting source to the same value	*/
 
 	source = get_source(0); /** which source should be set	*/
 	if (!(source == last_source))	/** if both are equal do not call set_source	*/
@@ -121,8 +121,16 @@ ISR (TIMER0_COMPA_vect)
 	{
 		set_leds(0,0);
 		startup_delay--;
-		if(!startup_delay)
+		if(!startup_delay%4)	/** do some fancy stuff with the LEDs during wait for power amp active **/
+		{
+			set_leds((startup_delay>>2)&0x03,((!startup_delay)>>2)&0x03);
+		} 
+		if(!startup_delay) /** startup delay timer expired	*/
+		{
 			AMP_ENABLE = 1;	/** unmute power amplifier	*/
+			restore_settings();	/** restore source and volume settings, set LEDs according to actual settings	*/
+		}
+			
 	}
 }
 
