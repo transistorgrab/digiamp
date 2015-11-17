@@ -20,29 +20,29 @@ void restore_settings(void)
 {
 	AMP_ENABLE = 0;	/** mute power amplifier	*/
 
-	uint8_t temp, temp1;
+	uint8_t temp;//, temp1;
 	temp = recall_source();
-	if (temp == 255)	/** default value from empty eeprom	*/
+	if ((temp == 0xFF)||(temp<SOURCE_MIN)||(temp>SOURCE_MAX))	/** default value from empty eeprom or illegal value	*/
 		temp = SOURCE_MIN;	/** set useful value	*/
 
-	if (temp)	/** is there a source value	*/
-	{
+//	if (temp)	/** is there a source value	*/
+//	{
 		set_source(temp);	/** if there is a value stored, restore it	*/
 		get_source(temp);	/** send restored value to the source switching function	*/
-	}
-	else
-	{
-		set_source(1);		/** if there is no value stored, set source to 1	*/
-		get_source(temp);	/** send restored value to the source switching function	*/
-	}
+//	}
+//	else
+//	{
+//		set_source(1);		/** if there is no value stored, set source to 1	*/
+//		get_source(temp);	/** send restored value to the source switching function	*/
+//	}
 
 	temp=recall_volume(1);	/** used twice	*/
-	if (temp == 255)	/** default value from empty eeprom	*/
+	if ((temp == 0xFF)||(temp<VOLUME_MAX)||(temp>VOLUME_MIN))	/** default value from empty eeprom	or illegal value	*/
 		temp = VOLUME_MIN;	/** set useful value	*/
-	temp1=recall_volume(0);	/** recall value for left volume	*/
-	if (temp1 == 255)	/** default value from empty eeprom	*/
-		temp1 = VOLUME_MIN;	/** set useful value	*/
-	set_volume(temp,temp1);	/** set recalled volume value			*/
+//	temp1=recall_volume(0);	/** recall value for left volume; currently not in use	*/
+//	if (temp1 == 0xFF)	/** default value from empty eeprom	*/
+//		temp1 = VOLUME_MIN;	/** set useful value	*/
+	set_volume(temp,temp);	/** set recalled volume value			*/
 	get_volume(0,temp);		/** send volume setting to volume changing function	*/
 
 }
@@ -106,25 +106,25 @@ ISR (TIMER0_COMPA_vect)
 	{
 		set_source(source);		/** set MUX to source		*/
 		last_source = source;	/** remember current source	*/
+		save_source(source);
 	}
 	volume = get_volume(0,0);
 	if (!(volume == last_volume))
 	{
 		set_volume(volume, volume);
 		/** save latest values to EEPROM	*/
-		save_volume(volume, volume);
-		save_source(source);
 		last_volume = volume;
+		save_volume(volume, volume);
 	}
 	
 	if (startup_delay)
 	{
-		set_leds(0,0);
+//		set_leds(0,0);
 		startup_delay--;
-		if(!startup_delay%4)	/** do some fancy stuff with the LEDs during wait for power amp active **/
-		{
-			set_leds((startup_delay>>2)&0x03,((!startup_delay)>>2)&0x03);
-		} 
+//		if(!startup_delay%4)	/** do some fancy stuff with the LEDs during wait for power amp active **/
+//		{
+//			set_leds((startup_delay>>2)&0x03,((!startup_delay)>>2)&0x03);
+//		} 
 		if(!startup_delay) /** startup delay timer expired	*/
 		{
 			AMP_ENABLE = 1;	/** unmute power amplifier	*/
@@ -134,7 +134,7 @@ ISR (TIMER0_COMPA_vect)
 	}
 }
 
-/** external interrupt 0 is bound to a incremental encoder,
+/** external interrupt 0 is bound to an incremental encoder,
 	at every activation the volume will be set higher or lower
 	according to the rotation direction:
 		rotate left for lower volume
