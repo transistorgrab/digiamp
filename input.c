@@ -3,6 +3,9 @@
 #include <avr/io.h>
 #include "digiamp.h"
 
+#define MAX_VOLUME_CHANGE 80	/** highest allowed volume change per step, obey int8_t limits!	*/
+#define MIN_VOLUME_CHANGE -80	/** lowest allowed volume change per step	*/
+
 /** get state of current source request	
     read button input and return source according to button action
 	
@@ -39,24 +42,32 @@ uint8_t get_source(uint8_t startup)
 uint8_t get_volume(int8_t value, uint8_t startup_value)
 {
 	static uint8_t volume_r;	/** current state: only one volume setting for both channels	*/
+	static int8_t volume_updates;	/** counter for volume updates during one schedule cycle	*/
+	
 	if (startup_value)			/** on startup a from eeprom restored value is given			*/
 		volume_r = startup_value;
 
-	/** change volume	*/
-	volume_r -= value;	/** "add" value to current volume	*/
+	if (value)
+	{
+		/** change volume	*/
+		volume_r -= (value+volume_updates);	/** "add" value to current volume	*/
+		if ((volume_updates<MIN_VOLUME_CHANGE)||(volume_updates>MAX_VOLUME_CHANGE)) /** below max allowed limits?	*/
+			volume_updates += value<<1;	/** dynamic volume change during current schedule cycle	*/
 
-	/** remember: volume is negative proportional to volume value, allow no overflow */
-	/** limit volume settings	*/
-	if ((volume_r <= VOLUME_MAX) && (value > 0))	/** do not allow volume settings < 0 (volume max)	*/
-	{
-		volume_r = VOLUME_MAX;
+		/** remember: volume is negative proportional to volume value, allow no overflow */
+		/** limit volume settings	*/
+		if ( ((volume_r <= VOLUME_MAX) && (value > 0)) || ((volume_r > VOLUME_MAX) && (volume_r > VOLUME_MIN) && (value > 0)) )	/** do not allow volume settings < 0 (volume max)	*/
+		{
+			volume_r = VOLUME_MAX;
+			volume_updates = 0;		/* prevent further build-up of acceleration and therefore overflow	*/
+		}
+		if ((volume_r >= MUTE_VAL) && (value < 0))	/** do not allow volume setting > 127 (mute)	*/
+		{
+			volume_r = MUTE_VAL;
+			volume_updates = 0;
+		}
 		return volume_r;
 	}
-	if ((volume_r >= MUTE_VAL) && (value < 0))	/** do not allow volume setting > 127 (mute)	*/
-	{
-		volume_r = MUTE_VAL;
-		return volume_r;
-	}
-		
+	volume_updates = 0;	/** reset counter each schedule cycle	*/	
 	return volume_r;	/** send current setting back	*/
 }
